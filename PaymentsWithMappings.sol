@@ -1,0 +1,28 @@
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.8.13;
+
+contract PaymentsWithMappings{
+
+    mapping(address => uint) public balanceReceived;
+
+    function sendMoney() public payable {
+        balanceReceived[msg.sender] += msg.value;
+    }
+
+    function getBalance() public view returns(uint) {
+        return address(this).balance;
+    }
+
+    function withdrawMoney(address payable _to, uint _amount) public{
+        require(_amount <= balanceReceived[msg.sender],"Insuffient funds!");
+        balanceReceived[msg.sender] -= _amount;
+        _to.transfer(_amount);
+    }
+
+    function withdrawAllMoney(address payable _to) public {
+        uint balanceToSend = balanceReceived[msg.sender];
+        balanceReceived[msg.sender] = 0;
+        _to.transfer(balanceToSend);
+    }
+}
